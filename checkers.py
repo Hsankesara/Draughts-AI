@@ -74,7 +74,7 @@ class Game:
 		"""Draws the window and board at the beginning of the game"""
 		self.graphics.setup_window()
 
-	def event_loop(self):
+	def player_turn(self):
 		"""
 		The event loop. This is where events are triggered
 		(like a mouse click) and then effect the game state.
@@ -134,7 +134,7 @@ class Game:
 		self.setup()
 
 		while True: # main game loop
-			self.event_loop()
+			self.player_turn()
 			self.update()
 
 	def end_turn(self):
@@ -496,10 +496,3 @@ class Square:
 	def __init__(self, color, occupant = None):
 		self.color = color # color is either BLACK or WHITE
 		self.occupant = occupant # occupant is a Square object
-
-def main():
-	game = Game()
-	game.main()
-
-if __name__ == "__main__":
-	main()
