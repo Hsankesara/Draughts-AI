@@ -105,7 +105,6 @@ class Game:
 
 							self.hop = True
 							self.selected_piece = self.mouse_pos
-
 						else:
 							self.end_turn()
 
@@ -395,6 +394,7 @@ class Board:
 		"""
 		 #print(x, y)
 		blind_legal_moves = self.blind_legal_moves(x, y)
+		print('BLind Legal moves', blind_legal_moves)
 		legal_moves = []
 
 		if hop == False:
