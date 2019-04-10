@@ -63,6 +63,8 @@ class Bot:
 
             else:
                 selected_piece = mouse_pos
+        if self.game.hop != True:
+            self.game.turn = BLUE
 
     def __random_step(self, board):
         possible_moves = self.__generate_all_possible_moves(board)
@@ -73,7 +75,6 @@ class Bot:
         random_move = random.choice(possible_moves)
         rand_choice = random.choice(random_move[2])
         self.__action(random_move, rand_choice, board)
-        self.game.turn = BLUE
         return
 
     def __generate_all_possible_moves(self, board):
