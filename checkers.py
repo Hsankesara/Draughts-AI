@@ -91,6 +91,7 @@ class Game:
 				self.terminate_game()
 
 			if event.type == MOUSEBUTTONDOWN:
+				print(self.hop)
 				if self.hop == False:
 					if self.board.location(self.mouse_pos[0], self.mouse_pos[1]).occupant != None and self.board.location(self.mouse_pos[0], self.mouse_pos[1]).occupant.color == self.turn:
 						self.selected_piece = self.mouse_pos
