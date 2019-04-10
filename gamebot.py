@@ -32,21 +32,47 @@ class Bot:
         if self.method == 'random':
             self.__random_step(board)
 
+    def __action(self, selected_piece, mouse_pos, board):
+        if self.game.hop == False:
+            if board.location(mouse_pos[0], mouse_pos[1]).occupant != None and board.location(mouse_pos[0], mouse_pos[1]).occupant.color == self.game.turn:
+                selected_piece = mouse_pos
+
+            elif selected_piece != None and mouse_pos in board.legal_moves(selected_piece[0], selected_piece[1]):
+
+                board.move_piece(
+                    selected_piece[0], selected_piece[1], mouse_pos[0], mouse_pos[1])
+
+                if mouse_pos not in board.adjacent(selected_piece[0], selected_piece[1]):
+                    board.remove_piece(selected_piece[0] + (mouse_pos[0] - selected_piece[0]) //
+                                       2, selected_piece[1] + (mouse_pos[1] - selected_piece[1]) // 2)
+
+                    self.game.hop = True
+                    selected_piece = mouse_pos
+                else:
+                    self.game.end_turn()
+
+        if self.game.hop == True:
+            if selected_piece != None and mouse_pos in board.legal_moves(selected_piece[0], selected_piece[1], self.game.hop):
+                board.move_piece(
+                    selected_piece[0], selected_piece[1], mouse_pos[0], mouse_pos[1])
+                board.remove_piece(selected_piece[0] + (mouse_pos[0] - selected_piece[0]) //
+                                   2, selected_piece[1] + (mouse_pos[1] - selected_piece[1]) // 2)
+
+            if board.legal_moves(mouse_pos[0], mouse_pos[1], self.game.hop) == []:
+                self.game.end_turn()
+
+            else:
+                selected_piece = mouse_pos
+
     def __random_step(self, board):
         possible_moves = self.__generate_all_possible_moves(board)
-        print(possible_moves, '*******')
         if possible_moves == []:
             self.game.end_turn()
             self.game.turn = BLUE
             return
         random_move = random.choice(possible_moves)
-        print(random_move)
         rand_choice = random.choice(random_move[2])
-        if rand_choice not in board.adjacent(random_move[0], random_move[1]):
-            board.remove_piece(random_move[0] + (rand_choice[0] - random_move[0]) //
-                               2, random_move[1] + (rand_choice[1] - random_move[1]) // 2)
-        board.move_piece(random_move[0], random_move[1],
-                         rand_choice[0], rand_choice[1])
+        self.__action(random_move, rand_choice, board)
         self.game.turn = BLUE
         return
 
