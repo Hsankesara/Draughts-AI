@@ -22,16 +22,17 @@ def main():
     game.setup()
     bot = gamebot.Bot(
         game, RED, heuristic='piece2val', method='rational', depth=1)
-    #random_bot_blue = gamebot.Bot(game, BLUE)
+    random_bot_blue = gamebot.Bot(
+        game, BLUE, heuristic='piece2val', method='rational', depth=1)
     while True:  # main game loop
         if game.turn == BLUE:
-            game.player_turn()
-            # random_bot_blue.step(game.board)
+            # game.player_turn()
+            random_bot_blue.step(game.board)
             game.update()
         else:
             bot.step(game.board)
             game.update()
-        # sleep(0.25)
+        sleep(0.1)
 
 
 if __name__ == "__main__":

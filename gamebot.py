@@ -134,7 +134,11 @@ class Bot:
                 self.__action_on_board(board_clone, pos, action)
                 step_value = self.heuristic(board_clone)
                 print(pos, action, step_value)
-                if(step_value >= max_value):
+                if step_value > max_value:
+                    max_value = step_value
+                    best_pos = (pos[0], pos[1])
+                    best_action = (action[0], action[1])
+                elif step_value == max_value and random.random() <= 0.5:
                     max_value = step_value
                     best_pos = (pos[0], pos[1])
                     best_action = (action[0], action[1])

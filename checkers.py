@@ -38,6 +38,7 @@ Everest Witman - May 2014 - Marlboro College - Programming Workshop
 
 import pygame, sys
 from pygame.locals import *
+from time import sleep
 
 pygame.font.init()
 
@@ -156,6 +157,7 @@ class Game:
 				self.graphics.draw_message("RED WINS!")
 			else:
 				self.graphics.draw_message("BLUE WINS!")
+			sleep(1)
 			self.terminate_game()
 
 	def check_for_endgame(self):
