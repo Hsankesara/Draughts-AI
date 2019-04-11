@@ -156,6 +156,7 @@ class Game:
 				self.graphics.draw_message("RED WINS!")
 			else:
 				self.graphics.draw_message("BLUE WINS!")
+			self.terminate_game()
 
 	def check_for_endgame(self):
 		"""
@@ -486,12 +487,17 @@ class Board:
 		"""
 		if self.location(x, y).occupant != None:
 			if (self.location(x, y).occupant.color == BLUE and y == 0) or (self.location(x, y).occupant.color == RED and y == 7):
-				self.location(x, y).occupant.king = True
+				self.location(x, y).occupant.crown()
 
 class Piece:
 	def __init__(self, color, king = False):
 		self.color = color
 		self.king = king
+		self.value = 1
+
+	def crown(self):
+		self.king = True
+		self.value = 2
 
 class Square:
 	def __init__(self, color, occupant = None):

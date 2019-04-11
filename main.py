@@ -1,6 +1,6 @@
 import checkers
 import gamebot
-
+from time import sleep
 ##COLORS##
 #             R    G    B
 WHITE = (255, 255, 255)
@@ -20,14 +20,17 @@ SOUTHEAST = "southeast"
 def main():
     game = checkers.Game()
     game.setup()
-    random_bot = gamebot.Bot(game)
+    random_bot = gamebot.Bot(game, RED)
+    #random_bot_blue = gamebot.Bot(game, BLUE)
     while True:  # main game loop
         if game.turn == BLUE:
             game.player_turn()
+            # random_bot_blue.step(game.board)
             game.update()
         else:
             random_bot.step(game.board)
             game.update()
+        # sleep(0.25)
 
 
 if __name__ == "__main__":

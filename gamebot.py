@@ -21,14 +21,18 @@ SOUTHEAST = "southeast"
 
 
 class Bot:
-    def __init__(self, game, method='random', heuristic=None, depth=None):
+    def __init__(self, game, color, method='random', heuristic=None, depth=None):
         self.method = method
         self.heuristic = heuristic
         self.depth = depth
         self.game = game
+        self.color = color
+        if self.color == BLUE:
+            self.adversary_color = RED
+        else:
+            self.adversary_color = BLUE
 
     def step(self, board):
-        self.game.turn = RED
         if self.method == 'random':
             self.__random_step(board)
 
@@ -60,11 +64,10 @@ class Bot:
 
             if board.legal_moves(mouse_pos[0], mouse_pos[1], self.game.hop) == []:
                 self.game.end_turn()
-
             else:
                 selected_piece = mouse_pos
         if self.game.hop != True:
-            self.game.turn = BLUE
+            self.game.turn = self.adversary_color
 
     def __random_step(self, board):
         possible_moves = self.__generate_all_possible_moves(board)
