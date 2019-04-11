@@ -21,9 +21,9 @@ def main():
     game = checkers.Game()
     game.setup()
     bot = gamebot.Bot(game, RED, heuristic='piece2val',
-                      method='alpha_beta', depth=4)
+                      method='alpha_beta', depth=2)
     random_bot_blue = gamebot.Bot(
-        game, BLUE, heuristic='piece2val', method='minmax', depth=4)
+        game, BLUE, heuristic='piece_and_board', method='alpha_beta', depth=2)
     while True:  # main game loop
         if game.turn == BLUE:
             # game.player_turn()
