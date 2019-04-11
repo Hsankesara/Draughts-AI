@@ -20,10 +20,10 @@ SOUTHEAST = "southeast"
 def main():
     game = checkers.Game()
     game.setup()
-    bot = gamebot.Bot(game, RED, heuristic='piece2val',
-                      method='alpha_beta', depth=2)
+    bot = gamebot.Bot(game, RED, heuristic='piece_and_board_pov',
+                      method='alpha_beta', depth=3)
     random_bot_blue = gamebot.Bot(
-        game, BLUE, heuristic='piece_and_board', method='alpha_beta', depth=2)
+        game, BLUE, heuristic='piece_and_board', method='alpha_beta', depth=3)
     while True:  # main game loop
         if game.turn == BLUE:
             # game.player_turn()

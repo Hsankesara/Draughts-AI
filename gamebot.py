@@ -28,7 +28,11 @@ class Bot:
         if heuristic == 'piece2val':
             self.heuristic = self.__piece2val
         elif heuristic == 'piece_and_board':
-            self.heuristic = self.__piece_and_board
+            self.heuristic = self.__piece_and_board2val
+        elif heuristic == 'piece_and_row':
+            self.heuristic = self.__piece_and_row2val
+        elif heuristic == 'piece_and_board_pov':
+            self.heuristic = self.__piece_and_board_pov2val
         self.depth = depth
         self.game = game
         self.color = color
@@ -116,7 +120,29 @@ class Bot:
                         score -= occupant.value
         return score
 
-    def __piece_and_board(self, board):
+    def __piece_and_row2val(self, board):
+        score = 0
+        if(self.color == RED):
+            for i in range(8):
+                for j in range(8):
+                    occupant = board.location(i, j).occupant
+                    if(occupant is not None):
+                        if occupant.color == self.color:
+                            score += 5 + j + 2 * (occupant.king)
+                        else:
+                            score -= 5 + (8 - j) + 2 * (occupant.king)
+        else:
+            for i in range(8):
+                for j in range(8):
+                    occupant = board.location(i, j).occupant
+                    if(occupant is not None):
+                        if occupant.color == self.color:
+                            score += 5 + (8 - j) + 2 * (occupant.king)
+                        else:
+                            score -= 5 + j + 2 * (occupant.king)
+        return score
+
+    def __piece_and_board2val(self, board):
         score = 0
         if(self.color == RED):
             for i in range(8):
@@ -127,16 +153,14 @@ class Bot:
                             score += 10
                         elif occupant.color != self.color and occupant.king:
                             score -= 10
-                        elif occupant.color == self.color and i < 4:
+                        elif occupant.color == self.color and j < 4:
                             score += 5
-                        elif occupant.color != self.color and i < 4:
+                        elif occupant.color != self.color and j < 4:
                             score -= 7
-                        elif occupant.color == self.color and i > 4:
+                        elif occupant.color == self.color and j > 4:
                             score += 7
-                        elif occupant.color != self.color and i > 4:
+                        elif occupant.color != self.color and j > 4:
                             score -= 5
-                        else:
-                            score -= occupant.value
         else:
             for i in range(8):
                 for j in range(8):
@@ -146,17 +170,56 @@ class Bot:
                             score += 10
                         elif occupant.color != self.color and occupant.king:
                             score -= 10
-                        elif occupant.color == self.color and i < 4:
+                        elif occupant.color == self.color and j < 4:
                             score += 7
-                        elif occupant.color != self.color and i < 4:
+                        elif occupant.color != self.color and j < 4:
                             score -= 5
-                        elif occupant.color == self.color and i > 4:
+                        elif occupant.color == self.color and j > 4:
                             score += 7
-                        elif occupant.color != self.color and i > 4:
+                        elif occupant.color != self.color and j > 4:
                             score -= 5
-                        else:
-                            score -= occupant.value
         return score
+
+    def __piece_and_board_pov2val(self, board):
+        score = 0
+        num_pieces = 0
+        if(self.color == RED):
+            for i in range(8):
+                for j in range(8):
+                    occupant = board.location(i, j).occupant
+                    if(occupant is not None):
+                        num_pieces += 1
+                        if occupant.color == self.color and occupant.king:
+                            score += 10
+                        elif occupant.color != self.color and occupant.king:
+                            score -= 10
+                        elif occupant.color == self.color and j < 4:
+                            score += 5
+                        elif occupant.color != self.color and j < 4:
+                            score -= 7
+                        elif occupant.color == self.color and j > 4:
+                            score += 7
+                        elif occupant.color != self.color and j > 4:
+                            score -= 5
+        else:
+            for i in range(8):
+                for j in range(8):
+                    occupant = board.location(i, j).occupant
+                    if(occupant is not None):
+                        num_pieces += 1
+                        if occupant.color == self.color and occupant.king:
+                            score += 10
+                        elif occupant.color != self.color and occupant.king:
+                            score -= 10
+                        elif occupant.color == self.color and j < 4:
+                            score += 7
+                        elif occupant.color != self.color and j < 4:
+                            score -= 5
+                        elif occupant.color == self.color and j > 4:
+                            score += 7
+                        elif occupant.color != self.color and j > 4:
+                            score -= 5
+        return score / num_pieces
 
     def __minmax_step(self, board):
         random_move, random_choice, _ = self.__minmax(
