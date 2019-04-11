@@ -2,6 +2,8 @@ import pygame
 import sys
 from pygame.locals import *
 import random
+from copy import deepcopy
+import math
 pygame.font.init()
 
 ##COLORS##
@@ -21,9 +23,10 @@ SOUTHEAST = "southeast"
 
 
 class Bot:
-    def __init__(self, game, color, method='random', heuristic=None, depth=None):
+    def __init__(self, game, color, method='rational', heuristic=None, depth=1):
         self.method = method
-        self.heuristic = heuristic
+        if heuristic == 'piece2val':
+            self.heuristic = self.__piece2val
         self.depth = depth
         self.game = game
         self.color = color
@@ -35,6 +38,8 @@ class Bot:
     def step(self, board):
         if self.method == 'random':
             self.__random_step(board)
+        elif self.method == 'rational':
+            self.__rational_step(board)
 
     def __action(self, selected_piece, mouse_pos, board):
         if self.game.hop == False:
@@ -85,7 +90,52 @@ class Bot:
         for i in range(8):
             for j in range(8):
                 if(board.legal_moves(i, j, self.game.hop) != [] and board.location(i, j).occupant != None and board.location(i, j).occupant.color == self.game.turn):
-                    print(board.legal_moves(i, j, self.game.hop))
                     possible_moves.append(
                         (i, j, board.legal_moves(i, j, self.game.hop)))
         return possible_moves
+
+    def __generate_move(self, board):
+        for i in range(8):
+            for j in range(8):
+                if(board.legal_moves(i, j, self.game.hop) != [] and board.location(i, j).occupant != None and board.location(i, j).occupant.color == self.game.turn):
+                    yield (i, j, board.legal_moves(i, j, self.game.hop))
+
+    def __piece2val(self, board):
+        score = 0
+        for i in range(8):
+            for j in range(8):
+                occupant = board.location(i, j).occupant
+                if(occupant is not None):
+                    if(occupant.color == self.color):
+                        score += occupant.value
+                    else:
+                        score -= occupant.value
+        return score
+
+    def __rational_step(self, board):
+        # possible_moves = self.__generate_all_possible_moves(board)
+        # if possible_moves == []:
+        #    self.game.end_turn()
+        #    self.game.turn = BLUE
+        #    return
+        random_move, random_choice = self.__alpha_beta_pruning(
+            self.depth - 1, board)
+        self.__action(random_move, random_choice, board)
+        return
+
+    def __alpha_beta_pruning(self, depth, board):
+        max_value = -float("inf")
+        best_pos = None
+        best_action = None
+        for pos in self.__generate_move(board):
+            print(pos)
+            for action in pos[2]:
+                board_clone = deepcopy(board)
+                board_clone.move_piece(pos[0], pos[1], action[0], action[1])
+                step_value = self.heuristic(board_clone)
+                print(step_value)
+                if(step_value > max_value):
+                    max_value = step_value
+                    best_pos = (pos[1], pos[2])
+                    best_action = (action[0], action[1])
+        return best_pos, best_action
