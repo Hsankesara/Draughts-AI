@@ -134,8 +134,8 @@ class Bot:
                 board_clone.move_piece(pos[0], pos[1], action[0], action[1])
                 step_value = self.heuristic(board_clone)
                 print(step_value)
-                if(step_value > max_value):
+                if(step_value >= max_value):
                     max_value = step_value
-                    best_pos = (pos[1], pos[2])
+                    best_pos = (pos[0], pos[1])
                     best_action = (action[0], action[1])
         return best_pos, best_action
