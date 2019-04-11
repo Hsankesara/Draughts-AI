@@ -128,7 +128,7 @@ class Game:
 	def terminate_game(self):
 		"""Quits the program and ends the game."""
 		pygame.quit()
-		sys.exit
+		sys.exit()
 
 	def main(self):
 		""""This executes the game and controls its flow."""
@@ -154,10 +154,12 @@ class Game:
 
 		if self.check_for_endgame():
 			if self.turn == BLUE:
+				print('1')
 				self.graphics.draw_message("RED WINS!")
 			else:
+				print('2')
 				self.graphics.draw_message("BLUE WINS!")
-			sleep(1)
+			print(self.turn)
 			self.terminate_game()
 
 	def check_for_endgame(self):
@@ -260,6 +262,7 @@ class Graphics:
 		"""
 		Draws message to the screen.
 		"""
+		print("in here")
 		self.message = True
 		self.font_obj = pygame.font.Font('freesansbold.ttf', 44)
 		self.text_surface_obj = self.font_obj.render(message, True, HIGH, BLACK)

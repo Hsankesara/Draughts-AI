@@ -23,7 +23,7 @@ SOUTHEAST = "southeast"
 
 
 class Bot:
-    def __init__(self, game, color, method='rational', heuristic=None, depth=1):
+    def __init__(self, game, color, method='random', heuristic=None, depth=1):
         self.method = method
         if heuristic == 'piece2val':
             self.heuristic = self.__piece2val
@@ -38,8 +38,10 @@ class Bot:
     def step(self, board):
         if self.method == 'random':
             self.__random_step(board)
-        elif self.method == 'rational':
-            self.__rational_step(board)
+        elif self.method == 'minmax':
+            self.__minmax_step(board)
+        elif self.method == 'alpha_beta':
+            self.__alpha_beta_step(board)
 
     def __action(self, selected_piece, mouse_pos, board):
         if self.game.hop == False:
@@ -112,18 +114,19 @@ class Bot:
                         score -= occupant.value
         return score
 
-    def __rational_step(self, board):
-        # possible_moves = self.__generate_all_possible_moves(board)
-        # if possible_moves == []:
-        #    self.game.end_turn()
-        #    self.game.turn = BLUE
-        #    return
-        random_move, random_choice, _ = self.__alpha_beta_pruning(
+    def __minmax_step(self, board):
+        random_move, random_choice, _ = self.__minmax(
             self.depth - 1, board, 'max')
         self.__action(random_move, random_choice, board)
         return
 
-    def __alpha_beta_pruning(self, depth, board, fn):
+    def __alpha_beta_step(self, board):
+        random_move, random_choice, _ = self.__alpha_beta(
+            self.depth - 1, board, 'max', alpha=-float('inf'), beta=float('inf'))
+        self.__action(random_move, random_choice, board)
+        return
+
+    def __minmax(self, depth, board, fn):
         if depth == 0:
             if fn == 'max':
                 max_value = -float("inf")
@@ -170,7 +173,7 @@ class Bot:
                     for action in pos[2]:
                         board_clone = deepcopy(board)
                         self.__action_on_board(board_clone, pos, action)
-                        _, __, step_value = self.__alpha_beta_pruning(
+                        _, __, step_value = self.__minmax(
                             depth - 1, board_clone, 'min')
                         if step_value > max_value:
                             max_value = step_value
@@ -189,7 +192,7 @@ class Bot:
                     for action in pos[2]:
                         board_clone = deepcopy(board)
                         self.__action_on_board(board_clone, pos, action)
-                        _, __, step_value = self.__alpha_beta_pruning(
+                        _, __, step_value = self.__minmax(
                             depth - 1, board_clone, 'max')
                         if step_value < min_value:
                             min_value = step_value
@@ -199,6 +202,100 @@ class Bot:
                             min_value = step_value
                             best_pos = pos
                             best_action = action
+                return best_pos, best_action, min_value
+
+    def __alpha_beta(self, depth, board, fn, alpha, beta):
+        if depth == 0:
+            if fn == 'max':
+                max_value = -float("inf")
+                best_pos = None
+                best_action = None
+                for pos in self.__generate_move(board):
+                    for action in pos[2]:
+                        board_clone = deepcopy(board)
+                        self.__action_on_board(board_clone, pos, action)
+                        step_value = self.heuristic(board_clone)
+                        if step_value > max_value:
+                            max_value = step_value
+                            best_pos = pos
+                            best_action = (action[0], action[1])
+                        elif step_value == max_value and random.random() <= 0.5:
+                            max_value = step_value
+                            best_pos = (pos[0], pos[1])
+                            best_action = (action[0], action[1])
+                        alpha = max(alpha, max_value)
+                        if beta <= alpha:
+                            print('alpha cutoff')
+                            break
+                return best_pos, best_action, max_value
+            else:
+                min_value = float("inf")
+                best_pos = None
+                best_action = None
+                for pos in self.__generate_move(board):
+                    for action in pos[2]:
+                        board_clone = deepcopy(board)
+                        self.__action_on_board(board_clone, pos, action)
+                        step_value = self.heuristic(board_clone)
+                        if step_value < min_value:
+                            min_value = step_value
+                            best_pos = pos
+                            best_action = action
+                        elif step_value == min_value and random.random() <= 0.5:
+                            min_value = step_value
+                            best_pos = pos
+                            best_action = action
+                        beta = min(beta, min_value)
+                        if beta <= alpha:
+                            print('beta cutoff')
+                            break
+                return best_pos, best_action, min_value
+        else:
+            if fn == 'max':
+                max_value = -float("inf")
+                best_pos = None
+                best_action = None
+                for pos in self.__generate_move(board):
+                    for action in pos[2]:
+                        board_clone = deepcopy(board)
+                        self.__action_on_board(board_clone, pos, action)
+                        _, __, step_value = self.__alpha_beta(
+                            depth - 1, board_clone, 'min', alpha, beta)
+                        if step_value > max_value:
+                            max_value = step_value
+                            best_pos = pos
+                            best_action = action
+                        elif step_value == max_value and random.random() <= 0.5:
+                            max_value = step_value
+                            best_pos = pos
+                            best_action = action
+                        alpha = max(alpha, max_value)
+                        if beta <= alpha:
+                            print('alpha cutoff')
+                            break
+                return best_pos, best_action, max_value
+            else:
+                min_value = float("inf")
+                best_pos = None
+                best_action = None
+                for pos in self.__generate_move(board):
+                    for action in pos[2]:
+                        board_clone = deepcopy(board)
+                        self.__action_on_board(board_clone, pos, action)
+                        _, __, step_value = self.__alpha_beta(
+                            depth - 1, board_clone, 'max', alpha, beta)
+                        if step_value < min_value:
+                            min_value = step_value
+                            best_pos = (pos[0], pos[1])
+                            best_action = (action[0], action[1])
+                        elif step_value == min_value and random.random() <= 0.5:
+                            min_value = step_value
+                            best_pos = pos
+                            best_action = action
+                        beta = min(beta, min_value)
+                        if beta <= alpha:
+                            print('beta cutoff')
+                            break
                 return best_pos, best_action, min_value
 
     def __action_on_board(self, board, selected_piece, mouse_pos, hop=False):
