@@ -131,11 +131,26 @@ class Bot:
             print(pos)
             for action in pos[2]:
                 board_clone = deepcopy(board)
-                board_clone.move_piece(pos[0], pos[1], action[0], action[1])
+                self.__action_on_board(board_clone, pos, action)
                 step_value = self.heuristic(board_clone)
-                print(step_value)
+                print(pos, action, step_value)
                 if(step_value >= max_value):
                     max_value = step_value
                     best_pos = (pos[0], pos[1])
                     best_action = (action[0], action[1])
         return best_pos, best_action
+
+    def __action_on_board(self, board, selected_piece, mouse_pos, hop=False):
+        if hop == False:
+            if board.location(mouse_pos[0], mouse_pos[1]).occupant != None and board.location(mouse_pos[0], mouse_pos[1]).occupant.color == game.turn:
+                selected_piece = mouse_pos
+
+            elif selected_piece != None and mouse_pos in board.legal_moves(selected_piece[0], selected_piece[1]):
+
+                board.move_piece(
+                    selected_piece[0], selected_piece[1], mouse_pos[0], mouse_pos[1])
+
+                if mouse_pos not in board.adjacent(selected_piece[0], selected_piece[1]):
+                    board.remove_piece(selected_piece[0] + (mouse_pos[0] - selected_piece[0]) //
+                                       2, selected_piece[1] + (mouse_pos[1] - selected_piece[1]) // 2)
+            return
