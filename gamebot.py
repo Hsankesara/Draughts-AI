@@ -23,16 +23,22 @@ SOUTHEAST = "southeast"
 
 
 class Bot:
-    def __init__(self, game, color, method='random', heuristic=None, depth=1):
+    def __init__(self, game, color, method='random', mid_eval=None, end_eval=None, depth=1):
         self.method = method
-        if heuristic == 'piece2val':
-            self.heuristic = self.__piece2val
-        elif heuristic == 'piece_and_board':
-            self.heuristic = self.__piece_and_board2val
-        elif heuristic == 'piece_and_row':
-            self.heuristic = self.__piece_and_row2val
-        elif heuristic == 'piece_and_board_pov':
-            self.heuristic = self.__piece_and_board_pov2val
+        if mid_eval == 'piece2val':
+            self._mid_eval = self.__piece2val
+        elif mid_eval == 'piece_and_board':
+            self._mid_eval = self.__piece_and_board2val
+        elif mid_eval == 'piece_and_row':
+            self._mid_eval = self.__piece_and_row2val
+        elif mid_eval == 'piece_and_board_pov':
+            self._mid_eval = self.__piece_and_board_pov2val
+        if end_eval == 'sum_of_dist':
+            self._end_eval = self._sum_of_dist
+        elif end_eval == 'farthest_piece':
+            self._end_eval = self._farthest_piece
+        else:
+            self._end_eval = None
         self.depth = depth
         self.game = game
         self.color = color
@@ -40,8 +46,15 @@ class Bot:
             self.adversary_color = RED
         else:
             self.adversary_color = BLUE
+        self._current_eval = self._mid_eval
+        self._end_eval_time = False
 
     def step(self, board):
+        if(self._end_eval is not None and self._end_eval_time == False):
+            if self._all_kings(board):
+                print('END EVAL is on')
+                self._end_eval_time  = True
+                self._current_eval = self._end_eval
         if self.method == 'random':
             self.__random_step(board)
         elif self.method == 'minmax':
@@ -243,7 +256,7 @@ class Bot:
                     for action in pos[2]:
                         board_clone = deepcopy(board)
                         self.__action_on_board(board_clone, pos, action)
-                        step_value = self.heuristic(board_clone)
+                        step_value = self._current_eval(board_clone)
                         if step_value > max_value:
                             max_value = step_value
                             best_pos = (pos[0], pos[1])
@@ -261,7 +274,7 @@ class Bot:
                     for action in pos[2]:
                         board_clone = deepcopy(board)
                         self.__action_on_board(board_clone, pos, action)
-                        step_value = self.heuristic(board_clone)
+                        step_value = self._current_eval(board_clone)
                         if step_value < min_value:
                             min_value = step_value
                             best_pos = pos
@@ -321,7 +334,7 @@ class Bot:
                     for action in pos[2]:
                         board_clone = deepcopy(board)
                         self.__action_on_board(board_clone, pos, action)
-                        step_value = self.heuristic(board_clone)
+                        step_value = self._current_eval(board_clone)
                         if step_value > max_value:
                             max_value = step_value
                             best_pos = pos
@@ -332,7 +345,7 @@ class Bot:
                             best_action = (action[0], action[1])
                         alpha = max(alpha, max_value)
                         if beta <= alpha:
-                            print('alpha cutoff')
+                            #print('alpha cutoff')
                             break
                 return best_pos, best_action, max_value
             else:
@@ -343,7 +356,7 @@ class Bot:
                     for action in pos[2]:
                         board_clone = deepcopy(board)
                         self.__action_on_board(board_clone, pos, action)
-                        step_value = self.heuristic(board_clone)
+                        step_value = self._current_eval(board_clone)
                         if step_value < min_value:
                             min_value = step_value
                             best_pos = pos
@@ -354,7 +367,7 @@ class Bot:
                             best_action = action
                         beta = min(beta, min_value)
                         if beta <= alpha:
-                            print('beta cutoff')
+                            #print('beta cutoff')
                             break
                 return best_pos, best_action, min_value
         else:
@@ -378,7 +391,7 @@ class Bot:
                             best_action = action
                         alpha = max(alpha, max_value)
                         if beta <= alpha:
-                            print('alpha cutoff')
+                            #print('alpha cutoff')
                             break
                 return best_pos, best_action, max_value
             else:
@@ -401,7 +414,7 @@ class Bot:
                             best_action = action
                         beta = min(beta, min_value)
                         if beta <= alpha:
-                            print('beta cutoff')
+                            #print('beta cutoff')
                             break
                 return best_pos, best_action, min_value
 
@@ -419,3 +432,47 @@ class Bot:
                     board.remove_piece(selected_piece[0] + (mouse_pos[0] - selected_piece[0]) //
                                        2, selected_piece[1] + (mouse_pos[1] - selected_piece[1]) // 2)
             return
+
+    def _all_kings(self, board):
+        for i in range(8):
+            for j in range(8):
+                occupant = board.location(i, j).occupant
+                if(occupant is not None and occupant.king == False):
+                    return False
+        return True
+
+    def _dist(self, x1, y1, x2, y2):
+        return math.sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2)
+
+    def _pieces_loc(self, board):
+        player_pieces = []
+        adversary_pieces = []
+        for i in range(8):
+            for j in range(8):
+                occupant = board.location(i, j).occupant
+                if(occupant is not None):
+                    if(occupant.color == self.color):
+                        player_pieces.append((i, j))
+                    else:
+                        adversary_pieces.append((i, j))
+        return player_pieces, adversary_pieces
+
+    def _sum_of_dist(self, board):
+        player_pieces, adversary_pieces = self._pieces_loc(board)
+        sum_of_dist = 0
+        for pos in player_pieces:
+            for adv in adversary_pieces:
+                sum_of_dist += self._dist(pos[0], pos[1], adv[0], adv[1])
+        if(len(player_pieces) >= len(adversary_pieces)):
+            sum_of_dist *= -1
+        return sum_of_dist
+
+    def _farthest_piece(self, board):
+        player_pieces, adversary_pieces = self._pieces_loc(board)
+        farthest_dist = 0
+        for pos in player_pieces:
+            for adv in adversary_pieces:
+                farthest_dist += max(farthest_dist, self._dist(pos[0], pos[1], adv[0], adv[1]))
+        if(len(player_pieces) >= len(adversary_pieces)):
+            farthest_dist *= -1
+        return farthest_dist
