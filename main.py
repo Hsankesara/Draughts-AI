@@ -19,7 +19,7 @@ SOUTHEAST = "southeast"
 
 def main():
     for _ in range(10):
-        game = checkers.Game()
+        game = checkers.Game(loop_mode=True)
         game.setup()
         bot = gamebot.Bot(game, RED, mid_eval='piece2val',
                           end_eval='sum_of_dist', method='alpha_beta', depth=2)

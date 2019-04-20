@@ -62,13 +62,14 @@ class Game:
 	The main game control.
 	"""
 
-	def __init__(self):
+	def __init__(self, loop_mode):
 		self.graphics = Graphics()
 		self.board = Board()
 		self.endit = False
 		self.turn = BLUE
 		self.selected_piece = None # a board location.
 		self.hop = False
+		self.loop_mode = loop_mode
 		self.selected_legal_moves = []
 
 	def setup(self):
@@ -160,8 +161,10 @@ class Game:
 				print('BLUE WINS!')
 				self.graphics.draw_message("BLUE WINS!")
 			print(self.turn)
-			#self.terminate_game()
-			self.endit = True
+			if(self.loop_mode):
+				self.endit = True
+			else:
+				self.terminate_game()
 
 	def check_for_endgame(self):
 		"""
