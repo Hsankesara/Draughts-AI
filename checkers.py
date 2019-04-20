@@ -154,10 +154,10 @@ class Game:
 
 		if self.check_for_endgame():
 			if self.turn == BLUE:
-				print('1')
+				print('RED WINS!')
 				self.graphics.draw_message("RED WINS!")
 			else:
-				print('2')
+				print('BLUE WINS!')
 				self.graphics.draw_message("BLUE WINS!")
 			print(self.turn)
 			self.terminate_game()
