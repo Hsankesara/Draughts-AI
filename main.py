@@ -23,7 +23,7 @@ def main():
     bot = gamebot.Bot(game, RED, mid_eval='piece2val',
                       end_eval='sum_of_dist', method='alpha_beta', depth=4)
     random_bot_blue = gamebot.Bot(
-        game, BLUE, mid_eval='piece_and_board_pov', method='alpha_beta', depth=4, end_eval='sum_of_dist')
+        game, BLUE, mid_eval='piece_and_board_pov', method='alpha_beta', depth=2, end_eval='sum_of_dist')
     while True:  # main game loop
         if game.turn == BLUE:
             # game.player_turn()

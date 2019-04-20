@@ -494,6 +494,18 @@ class Board:
 			if (self.location(x, y).occupant.color == BLUE and y == 0) or (self.location(x, y).occupant.color == RED and y == 7):
 				self.location(x, y).occupant.crown()
 
+	def repr_matrix(self):
+		for j in range(8):
+			for i in range(8):
+				if self.matrix[i][j].occupant is not None:
+					if self.matrix[i][j].occupant.color == BLUE:
+						print('B', end=" ")
+					else:
+						print('R', end=" ")
+				else:
+					print('X', end=" ")
+			print('')
+
 class Piece:
 	def __init__(self, color, king = False):
 		self.color = color

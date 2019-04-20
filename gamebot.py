@@ -63,6 +63,9 @@ class Bot:
             self._alpha_beta_step(board)
 
     def _action(self, selected_piece, mouse_pos, board):
+        if selected_piece is None:
+            print('NONE')
+            return
         if self.game.hop == False:
             if board.location(mouse_pos[0], mouse_pos[1]).occupant != None and board.location(mouse_pos[0], mouse_pos[1]).occupant.color == self.game.turn:
                 selected_piece = mouse_pos
