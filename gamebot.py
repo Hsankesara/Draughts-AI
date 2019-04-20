@@ -347,6 +347,9 @@ class Bot:
                         if beta <= alpha:
                             #print('alpha cutoff')
                             break
+                    if beta <= alpha:
+                        #print('alpha cutoff')
+                        break
                 return best_pos, best_action, max_value
             else:
                 min_value = float("inf")
@@ -369,6 +372,9 @@ class Bot:
                         if beta <= alpha:
                             #print('beta cutoff')
                             break
+                    if beta <= alpha:
+                        #print('beta cutoff')
+                        break
                 return best_pos, best_action, min_value
         else:
             if fn == 'max':
@@ -393,6 +399,9 @@ class Bot:
                         if beta <= alpha:
                             #print('alpha cutoff')
                             break
+                    if beta <= alpha:
+                        #print('alpha cutoff')
+                        break
                 return best_pos, best_action, max_value
             else:
                 min_value = float("inf")
@@ -416,6 +425,9 @@ class Bot:
                         if beta <= alpha:
                             #print('beta cutoff')
                             break
+                    if beta <= alpha:
+                        #print('beta cutoff')
+                        break
                 return best_pos, best_action, min_value
 
     def _action_on_board(self, board, selected_piece, mouse_pos, hop=False):
