@@ -65,7 +65,7 @@ class Game:
 	def __init__(self):
 		self.graphics = Graphics()
 		self.board = Board()
-
+		self.endit = False
 		self.turn = BLUE
 		self.selected_piece = None # a board location.
 		self.hop = False
@@ -160,7 +160,8 @@ class Game:
 				print('BLUE WINS!')
 				self.graphics.draw_message("BLUE WINS!")
 			print(self.turn)
-			self.terminate_game()
+			#self.terminate_game()
+			self.endit = True
 
 	def check_for_endgame(self):
 		"""
