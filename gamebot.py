@@ -332,6 +332,8 @@ class Bot:
                 for pos in self._generate_move(board):
                     for action in pos[2]:
                         board_clone = deepcopy(board)
+                        self.color, self.adversary_color = self.adversary_color, self.color
+                        self.game.turn = self.color
                         self._action_on_board(board_clone, pos, action)
                         _, _, step_value = self._minmax(
                             depth - 1, board_clone, 'max')
