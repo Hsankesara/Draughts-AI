@@ -66,11 +66,13 @@ class Bot:
             self._alpha_beta_step(board)
 
     def _action(self, selected_piece, mouse_pos, board):
-        print('xxxxxxxxxxx')
-        print(selected_piece, mouse_pos, board.location(selected_piece[0], selected_piece[1]).occupant)
+        #print('xxxxxxxxxxx')
         if selected_piece is None:
-            print('THE FUCk')
-            sleep(100)
+            board.repr_matrix()
+            print(self._generate_all_possible_moves(board))
+            self.game.end_turn()
+            sleep(400)
+        #print(selected_piece, mouse_pos, board.location(selected_piece[0], selected_piece[1]).occupant)
         if self.game.hop == False:
             if board.location(mouse_pos[0], mouse_pos[1]).occupant != None and board.location(mouse_pos[0], mouse_pos[1]).occupant.color == self.game.turn:
                 selected_piece = mouse_pos
@@ -86,7 +88,10 @@ class Bot:
 
                     self.game.hop = True
                     selected_piece = mouse_pos
-                else:
+                    mouse_pos = board.legal_moves(selected_piece[0], selected_piece[1], True)
+                    if mouse_pos != []:
+                        #print("HOP in Action", selected_piece, mouse_pos)
+                        self._action(selected_piece, mouse_pos[0], board)
                     self.game.end_turn()
 
         if self.game.hop == True:
@@ -100,6 +105,11 @@ class Bot:
                 self.game.end_turn()
             else:
                 selected_piece = mouse_pos
+                mouse_pos = board.legal_moves(selected_piece[0], selected_piece[1], True)
+                if mouse_pos != []:
+                    #print("HOP in Action", selected_piece, mouse_pos)
+                    self._action(selected_piece, mouse_pos[0], board)
+                self.game.end_turn()
         if self.game.hop != True:
             self.game.turn = self.adversary_color
 
@@ -271,15 +281,143 @@ class Bot:
                         step_value = self._current_eval(board_clone)
                         self.color, self.adversary_color = self.adversary_color, self.color
                         self.game.turn = self.color
-                        #print('max->', depth, step_value, (pos[0], pos[1]), action, self.color)
+
                         if step_value > max_value:
                             max_value = step_value
-                            best_pos = (pos[0], pos[1])
+                            best_pos = pos
                             best_action = (action[0], action[1])
                         elif step_value == max_value and random.random() <= 0.5:
                             max_value = step_value
                             best_pos = (pos[0], pos[1])
                             best_action = (action[0], action[1])
+                        if(step_value == -float("inf") and best_pos is  None):
+                            best_pos = (pos[0], pos[1])
+                            best_action = (action[0], action[1])
+                return best_pos, best_action, max_value
+            else:
+                min_value = float("inf")
+                best_pos = None
+                best_action = None
+                for pos in self._generate_move(board):
+                    for action in pos[2]:
+                        board_clone = deepcopy(board)
+                        self.color, self.adversary_color = self.adversary_color, self.color
+                        self.game.turn = self.color
+                        self._action_on_board(board_clone, pos, action)
+                        step_value = self._current_eval(board_clone)
+                        self.color, self.adversary_color = self.adversary_color, self.color
+                        self.game.turn = self.color
+                        if step_value < min_value:
+                            min_value = step_value
+                            best_pos = pos
+                            best_action = action
+                        elif step_value == min_value and random.random() <= 0.5:
+                            min_value = step_value
+                            best_pos = pos
+                            best_action = action
+                        if(step_value == float("inf") and best_pos is  None):
+                            best_pos = (pos[0], pos[1])
+                            best_action = (action[0], action[1])
+                return best_pos, best_action, min_value
+        else:
+            if fn == 'max':
+                max_value = -float("inf")
+                best_pos = None
+                best_action = None
+                for pos in self._generate_move(board):
+                    for action in pos[2]:
+                        board_clone = deepcopy(board)
+                        self.color, self.adversary_color = self.adversary_color, self.color
+                        self.game.turn = self.color
+                        self._action_on_board(board_clone, pos, action)
+                        if self._check_for_endgame(board_clone):
+                            step_value = float("inf")
+                        else:
+                            _, _, step_value = self._minmax(depth - 1, board_clone, 'min')
+                        self.color, self.adversary_color = self.adversary_color, self.color
+                        self.game.turn = self.color
+                        #print('POS', (pos[0], pos[1]), 'ACK', action, 'MAX', depth, step_value)
+                        if(step_value is None):
+                            continue
+                        #print('max->', depth, step_value, (pos[0], pos[1]), action, self.color)
+                        if step_value > max_value:
+                            max_value = step_value
+                            best_pos = pos
+                            best_action = action
+                        elif step_value == max_value and random.random() <= 0.5:
+                            max_value = step_value
+                            best_pos = pos
+                            best_action = action
+                        if(step_value == -float("inf") and best_pos is  None):
+                            best_pos = (pos[0], pos[1])
+                            best_action = (action[0], action[1])
+                return best_pos, best_action, max_value
+            else:
+                min_value = float("inf")
+                best_pos = None
+                best_action = None
+                for pos in self._generate_move(board):
+                    for action in pos[2]:
+                        board_clone = deepcopy(board)
+                        #print('POS', (pos[0], pos[1]), 'ACK', action, 'MIN', depth)
+                        self.color, self.adversary_color = self.adversary_color, self.color
+                        self.game.turn = self.color
+                        self._action_on_board(board_clone, pos, action)
+                        if self._check_for_endgame(board_clone):
+                            step_value = -float("inf")
+                        else:
+                            _, _, step_value = self._minmax( depth - 1, board_clone, 'max')
+                        self.color, self.adversary_color = self.adversary_color, self.color
+                        self.game.turn = self.color
+                        if(step_value is None):
+                            continue
+                        if step_value < min_value:
+                            min_value = step_value
+                            best_pos = (pos[0], pos[1])
+                            best_action = (action[0], action[1])
+                        elif step_value == min_value and random.random() <= 0.5:
+                            min_value = step_value
+                            best_pos = pos
+                            best_action = action
+                        if(step_value == float("inf") and best_pos is  None):
+                            best_pos = (pos[0], pos[1])
+                            best_action = (action[0], action[1])
+                return best_pos, best_action, min_value
+
+    def _alpha_beta(self, depth, board, fn, alpha, beta):
+        if depth == 0:
+            if fn == 'max':
+                max_value = -float("inf")
+                best_pos = None
+                best_action = None
+                for pos in self._generate_move(board):
+                    for action in pos[2]:
+                        board_clone = deepcopy(board)
+                        self.color, self.adversary_color = self.adversary_color, self.color
+                        self.game.turn = self.color
+                        self._action_on_board(board_clone, pos, action)
+                        step_value = self._current_eval(board_clone)
+                        self.color, self.adversary_color = self.adversary_color, self.color
+                        self.game.turn = self.color
+                        #print('max->', depth, step_value, (pos[0], pos[1]), action, self.color)
+                        if step_value > max_value:
+                            max_value = step_value
+                            best_pos = pos
+                            best_action = (action[0], action[1])
+                        elif step_value == max_value and random.random() <= 0.5:
+                            max_value = step_value
+                            best_pos = (pos[0], pos[1])
+                            best_action = (action[0], action[1])
+                        if(step_value == -float("inf") and best_pos is  None):
+                            best_pos = (pos[0], pos[1])
+                            best_action = (action[0], action[1])
+                        alpha = max(alpha, max_value)
+                        if beta < alpha:
+                            #print('beta cutoff')
+                            break
+                    if beta < alpha:
+                        #print('beta cutoff')
+                        break
                 return best_pos, best_action, max_value
             else:
                 min_value = float("inf")
@@ -303,6 +441,16 @@ class Bot:
                             min_value = step_value
                             best_pos = pos
                             best_action = action
+                        if(step_value == float("inf") and best_pos is  None):
+                            best_pos = (pos[0], pos[1])
+                            best_action = (action[0], action[1])
+                        beta = min(beta, min_value)
+                        if beta < alpha:
+                            #print('alpha cutoff')
+                            break
+                    if beta < alpha:
+                        #print('alpha cutoff')
+                        break
                 return best_pos, best_action, min_value
         else:
             if fn == 'max':
@@ -311,15 +459,19 @@ class Bot:
                 best_action = None
                 for pos in self._generate_move(board):
                     for action in pos[2]:
-                        #print('POS', (pos[0], pos[1]), 'ACK', action)
                         board_clone = deepcopy(board)
                         self.color, self.adversary_color = self.adversary_color, self.color
                         self.game.turn = self.color
                         self._action_on_board(board_clone, pos, action)
-                        _, _, step_value = self._minmax(
-                            depth - 1, board_clone, 'min')
+                        if self._check_for_endgame(board_clone):
+                            step_value = float("inf")
+                        else:
+                            _, _, step_value = self._alpha_beta(depth - 1, board_clone, 'min', alpha, beta)
                         self.color, self.adversary_color = self.adversary_color, self.color
                         self.game.turn = self.color
+                        #print('POS', (pos[0], pos[1]), 'ACK', action, 'MAX', depth, step_value)
+                        if(step_value is None):
+                            continue
                         #print('max->', depth, step_value, (pos[0], pos[1]), action, self.color)
                         if step_value > max_value:
                             max_value = step_value
@@ -329,125 +481,9 @@ class Bot:
                             max_value = step_value
                             best_pos = pos
                             best_action = action
-                return best_pos, best_action, max_value
-            else:
-                min_value = float("inf")
-                best_pos = None
-                best_action = None
-                for pos in self._generate_move(board):
-                    for action in pos[2]:
-                        board_clone = deepcopy(board)
-                        self.color, self.adversary_color = self.adversary_color, self.color
-                        self.game.turn = self.color
-                        self._action_on_board(board_clone, pos, action)
-                        _, _, step_value = self._minmax(
-                            depth - 1, board_clone, 'max')
-                        self.color, self.adversary_color = self.adversary_color, self.color
-                        self.game.turn = self.color
-                        if step_value < min_value:
-                            min_value = step_value
+                        if(step_value == -float("inf") and best_pos is  None):
                             best_pos = (pos[0], pos[1])
                             best_action = (action[0], action[1])
-                        elif step_value == min_value and random.random() <= 0.5:
-                            min_value = step_value
-                            best_pos = pos
-                            best_action = action
-                return best_pos, best_action, min_value
-
-    def _alpha_beta(self, depth, board, fn, alpha, beta):
-        if depth == 0:
-            if fn == 'max':
-                max_value = -float("inf")
-                best_pos = None
-                best_action = None
-                for pos in self._generate_move(board):
-                    for action in pos[2]:
-                        board_clone = deepcopy(board)
-                        self.color, self.adversary_color = self.adversary_color, self.color
-                        self.game.turn = self.color
-                        self._action_on_board(board_clone, pos, action)
-                        step_value = self._current_eval(board_clone)
-                        self.color, self.adversary_color = self.adversary_color, self.color
-                        self.game.turn = self.color
-                        print('max->', depth, step_value, (pos[0], pos[1]), action, self.color)
-                        if step_value > max_value:
-                            max_value = step_value
-                            best_pos = pos
-                            best_action = (action[0], action[1])
-                        elif step_value == max_value and random.random() <= 0.5:
-                            max_value = step_value
-                            best_pos = (pos[0], pos[1])
-                            best_action = (action[0], action[1])
-                        alpha = max(alpha, max_value)
-                        if beta < alpha:
-                            ##print('beta cutoff')
-                            break
-                    if beta < alpha:
-                        ##print('beta cutoff')
-                        break
-                print(best_pos, best_action, max_value, depth, 'MAX')
-                if max_value == -float("inf"):
-                    return None, None, None
-                return best_pos, best_action, max_value
-            else:
-                min_value = float("inf")
-                best_pos = None
-                best_action = None
-                for pos in self._generate_move(board):
-                    for action in pos[2]:
-                        board_clone = deepcopy(board)
-                        self.color, self.adversary_color = self.adversary_color, self.color
-                        self.game.turn = self.color
-                        self._action_on_board(board_clone, pos, action)
-                        step_value = self._current_eval(board_clone)
-                        self.color, self.adversary_color = self.adversary_color, self.color
-                        self.game.turn = self.color
-                        print('min->', depth, step_value, (pos[0], pos[1]), action, self.color)
-                        if step_value < min_value:
-                            min_value = step_value
-                            best_pos = pos
-                            best_action = action
-                        elif step_value == min_value and random.random() <= 0.5:
-                            min_value = step_value
-                            best_pos = pos
-                            best_action = action
-                        beta = min(beta, min_value)
-                        if beta < alpha:
-                            ##print('alpha cutoff')
-                            break
-                    if beta < alpha:
-                        ##print('alpha cutoff')
-                        break
-                #print(best_pos, best_action, min_value, depth, 'MIN')
-                if min_value == float("inf"):
-                    return None, None, None
-                return best_pos, best_action, min_value
-        else:
-            if fn == 'max':
-                max_value = -float("inf")
-                best_pos = None
-                best_action = None
-                for pos in self._generate_move(board):
-                    for action in pos[2]:
-                        board_clone = deepcopy(board)
-                        print('POS', (pos[0], pos[1]), 'ACK', action, 'MAX', depth)
-                        self.color, self.adversary_color = self.adversary_color, self.color
-                        self.game.turn = self.color
-                        self._action_on_board(board_clone, pos, action)
-                        _, _, step_value = self._alpha_beta(depth - 1, board_clone, 'min', alpha, beta)
-                        self.color, self.adversary_color = self.adversary_color, self.color
-                        self.game.turn = self.color
-                        if(step_value is None):
-                            continue
-                        print('max->', depth, step_value, (pos[0], pos[1]), action, self.color)
-                        if step_value > max_value:
-                            max_value = step_value
-                            best_pos = pos
-                            best_action = action
-                        elif step_value == max_value and random.random() <= 0.5:
-                            max_value = step_value
-                            best_pos = pos
-                            best_action = action
                         alpha = max(alpha, max_value)
                         if beta <= alpha:
                             ##print('beta cutoff')
@@ -455,8 +491,6 @@ class Bot:
                     if beta < alpha:
                         ##print('alpha cu3toff')
                         break
-                if max_value == -float("inf"):
-                    return None, None, None
                 return best_pos, best_action, max_value
             else:
                 min_value = float("inf")
@@ -465,11 +499,14 @@ class Bot:
                 for pos in self._generate_move(board):
                     for action in pos[2]:
                         board_clone = deepcopy(board)
-                        print('POS', (pos[0], pos[1]), 'ACK', action, 'MIN', depth)
+                        #print('POS', (pos[0], pos[1]), 'ACK', action, 'MIN', depth)
                         self.color, self.adversary_color = self.adversary_color, self.color
                         self.game.turn = self.color
                         self._action_on_board(board_clone, pos, action)
-                        _, _, step_value = self._alpha_beta( depth - 1, board_clone, 'max', alpha, beta)
+                        if self._check_for_endgame(board_clone):
+                            step_value = -float("inf")
+                        else:
+                            _, _, step_value = self._alpha_beta( depth - 1, board_clone, 'max', alpha, beta)
                         self.color, self.adversary_color = self.adversary_color, self.color
                         self.game.turn = self.color
                         if(step_value is None):
@@ -482,16 +519,17 @@ class Bot:
                             min_value = step_value
                             best_pos = pos
                             best_action = action
-                        print('min->', depth, step_value, (pos[0], pos[1]), action, self.color)
+                        #print('min->', depth, step_value, (pos[0], pos[1]), action, self.color)
+                        if(step_value == float("inf") and best_pos is  None):
+                            best_pos = (pos[0], pos[1])
+                            best_action = (action[0], action[1])
                         beta = min(beta, min_value)
                         if beta < alpha:
-                            ##print('alpha cutoff')
+                            #print('alpha cutoff')
                             break
                     if beta < alpha:
-                        ##print('alpha cutoff')
+                        #print('alpha cutoff')
                         break
-                if min_value == float("inf"):
-                    return None, None, None
                 return best_pos, best_action, min_value
 
     def _action_on_board(self, board, selected_piece, mouse_pos, hop=False):
@@ -515,6 +553,7 @@ class Bot:
                         #print("HOP in Action", selected_piece, mouse_pos)
                         self._action_on_board(board, selected_piece, mouse_pos[0],hop=True)
         else:
+            #print(selected_piece, mouse_pos)
             if selected_piece != None and mouse_pos in board.legal_moves(selected_piece[0], selected_piece[1], hop):
                 board.move_piece(selected_piece[0], selected_piece[1], mouse_pos[0], mouse_pos[1])
                 board.remove_piece(selected_piece[0] + (mouse_pos[0] - selected_piece[0]) // 2, selected_piece[1] + (mouse_pos[1] - selected_piece[1]) // 2)
@@ -571,3 +610,11 @@ class Bot:
         if(len(player_pieces) >= len(adversary_pieces)):
             farthest_dist *= -1
         return farthest_dist
+
+    def _check_for_endgame(self, board):
+        for x in range(8):
+            for y in range(8):
+                if board.location(x, y).color == BLACK and board.location(x, y).occupant != None and board.location(x, y).occupant.color == self.game.turn:
+                    if board.legal_moves(x, y) != []:
+                        return False
+        return True
