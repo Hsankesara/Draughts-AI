@@ -4,7 +4,9 @@ from pygame.locals import *
 import random
 from copy import deepcopy
 import math
+from time import sleep
 pygame.font.init()
+
 
 ##COLORS##
 #             R    G    B
@@ -42,6 +44,7 @@ class Bot:
         self.depth = depth
         self.game = game
         self.color = color
+        self.eval_color = color
         if self.color == BLUE:
             self.adversary_color = RED
         else:
@@ -63,9 +66,11 @@ class Bot:
             self._alpha_beta_step(board)
 
     def _action(self, selected_piece, mouse_pos, board):
+        print('xxxxxxxxxxx')
+        print(selected_piece, mouse_pos, board.location(selected_piece[0], selected_piece[1]).occupant)
         if selected_piece is None:
-            print('NONE')
-            return
+            print('THE FUCk')
+            sleep(100)
         if self.game.hop == False:
             if board.location(mouse_pos[0], mouse_pos[1]).occupant != None and board.location(mouse_pos[0], mouse_pos[1]).occupant.color == self.game.turn:
                 selected_piece = mouse_pos
@@ -130,7 +135,7 @@ class Bot:
             for j in range(8):
                 occupant = board.location(i, j).occupant
                 if(occupant is not None):
-                    if(occupant.color == self.color):
+                    if(occupant.color == self.eval_color):
                         score += occupant.value
                     else:
                         score -= occupant.value
@@ -138,12 +143,12 @@ class Bot:
 
     def _piece_and_row2val(self, board):
         score = 0
-        if(self.color == RED):
+        if(self.eval_color == RED):
             for i in range(8):
                 for j in range(8):
                     occupant = board.location(i, j).occupant
                     if(occupant is not None):
-                        if occupant.color == self.color:
+                        if occupant.color == self.eval_color:
                             score += 5 + j + 2 * (occupant.king)
                         else:
                             score -= 5 + (8 - j) + 2 * (occupant.king)
@@ -152,7 +157,7 @@ class Bot:
                 for j in range(8):
                     occupant = board.location(i, j).occupant
                     if(occupant is not None):
-                        if occupant.color == self.color:
+                        if occupant.color == self.eval_color:
                             score += 5 + (8 - j) + 2 * (occupant.king)
                         else:
                             score -= 5 + j + 2 * (occupant.king)
@@ -160,62 +165,62 @@ class Bot:
 
     def _piece_and_board2val(self, board):
         score = 0
-        if(self.color == RED):
+        if(self.eval_color == RED):
             for i in range(8):
                 for j in range(8):
                     occupant = board.location(i, j).occupant
                     if(occupant is not None):
-                        if occupant.color == self.color and occupant.king:
+                        if occupant.color == self.eval_color and occupant.king:
                             score += 10
-                        elif occupant.color != self.color and occupant.king:
+                        elif occupant.color != self.eval_color and occupant.king:
                             score -= 10
-                        elif occupant.color == self.color and j < 4:
+                        elif occupant.color == self.eval_color and j < 4:
                             score += 5
-                        elif occupant.color != self.color and j < 4:
+                        elif occupant.color != self.eval_color and j < 4:
                             score -= 7
-                        elif occupant.color == self.color and j > 4:
+                        elif occupant.color == self.eval_color and j > 4:
                             score += 7
-                        elif occupant.color != self.color and j > 4:
+                        elif occupant.color != self.eval_color and j > 4:
                             score -= 5
         else:
             for i in range(8):
                 for j in range(8):
                     occupant = board.location(i, j).occupant
                     if(occupant is not None):
-                        if occupant.color == self.color and occupant.king:
+                        if occupant.color == self.eval_color and occupant.king:
                             score += 10
-                        elif occupant.color != self.color and occupant.king:
+                        elif occupant.color != self.eval_color and occupant.king:
                             score -= 10
-                        elif occupant.color == self.color and j < 4:
+                        elif occupant.color == self.eval_color and j < 4:
                             score += 7
-                        elif occupant.color != self.color and j < 4:
+                        elif occupant.color != self.eval_color and j < 4:
                             score -= 5
-                        elif occupant.color == self.color and j > 4:
+                        elif occupant.color == self.eval_color and j > 4:
                             score += 7
-                        elif occupant.color != self.color and j > 4:
+                        elif occupant.color != self.eval_color and j > 4:
                             score -= 5
         return score
 
     def _piece_and_board_pov2val(self, board):
         score = 0
         num_pieces = 0
-        if(self.color == RED):
+        if(self.eval_color == RED):
             for i in range(8):
                 for j in range(8):
                     occupant = board.location(i, j).occupant
                     if(occupant is not None):
                         num_pieces += 1
-                        if occupant.color == self.color and occupant.king:
+                        if occupant.color == self.eval_color and occupant.king:
                             score += 10
-                        elif occupant.color != self.color and occupant.king:
+                        elif occupant.color != self.eval_color and occupant.king:
                             score -= 10
-                        elif occupant.color == self.color and j < 4:
+                        elif occupant.color == self.eval_color and j < 4:
                             score += 5
-                        elif occupant.color != self.color and j < 4:
+                        elif occupant.color != self.eval_color and j < 4:
                             score -= 7
-                        elif occupant.color == self.color and j > 4:
+                        elif occupant.color == self.eval_color and j > 4:
                             score += 7
-                        elif occupant.color != self.color and j > 4:
+                        elif occupant.color != self.eval_color and j > 4:
                             score -= 5
         else:
             for i in range(8):
@@ -223,17 +228,17 @@ class Bot:
                     occupant = board.location(i, j).occupant
                     if(occupant is not None):
                         num_pieces += 1
-                        if occupant.color == self.color and occupant.king:
+                        if occupant.color == self.eval_color and occupant.king:
                             score += 10
-                        elif occupant.color != self.color and occupant.king:
+                        elif occupant.color != self.eval_color and occupant.king:
                             score -= 10
-                        elif occupant.color == self.color and j < 4:
+                        elif occupant.color == self.eval_color and j < 4:
                             score += 7
-                        elif occupant.color != self.color and j < 4:
+                        elif occupant.color != self.eval_color and j < 4:
                             score -= 5
-                        elif occupant.color == self.color and j > 4:
+                        elif occupant.color == self.eval_color and j > 4:
                             score += 7
-                        elif occupant.color != self.color and j > 4:
+                        elif occupant.color != self.eval_color and j > 4:
                             score -= 5
         return score / num_pieces
 
@@ -246,9 +251,9 @@ class Bot:
     def _alpha_beta_step(self, board):
         random_move, random_choice, _ = self._alpha_beta(
             self.depth - 1, board, 'max', alpha=-float('inf'), beta=float('inf'))
-        #print(self.color, self.game.turn, self.game.hop)
+        #print(self.eval_color, self.game.turn, self.game.hop)
         self._action(random_move, random_choice, board)
-        #print(self.color, self.game.turn, self.game.hop)
+        #print(self.eval_color, self.game.turn, self.game.hop)
         return
 
     def _minmax(self, depth, board, fn):
@@ -364,7 +369,7 @@ class Bot:
                         step_value = self._current_eval(board_clone)
                         self.color, self.adversary_color = self.adversary_color, self.color
                         self.game.turn = self.color
-                        #print('max->', depth, step_value, (pos[0], pos[1]), action, self.color)
+                        print('max->', depth, step_value, (pos[0], pos[1]), action, self.color)
                         if step_value > max_value:
                             max_value = step_value
                             best_pos = pos
@@ -374,12 +379,15 @@ class Bot:
                             best_pos = (pos[0], pos[1])
                             best_action = (action[0], action[1])
                         alpha = max(alpha, max_value)
-                        if beta <= alpha:
+                        if beta < alpha:
                             ##print('beta cutoff')
                             break
-                    if beta <= alpha:
+                    if beta < alpha:
                         ##print('beta cutoff')
                         break
+                print(best_pos, best_action, max_value, depth, 'MAX')
+                if max_value == -float("inf"):
+                    return None, None, None
                 return best_pos, best_action, max_value
             else:
                 min_value = float("inf")
@@ -394,7 +402,7 @@ class Bot:
                         step_value = self._current_eval(board_clone)
                         self.color, self.adversary_color = self.adversary_color, self.color
                         self.game.turn = self.color
-                        #print('min->', depth, step_value, (pos[0], pos[1]), action, self.color)
+                        print('min->', depth, step_value, (pos[0], pos[1]), action, self.color)
                         if step_value < min_value:
                             min_value = step_value
                             best_pos = pos
@@ -404,12 +412,15 @@ class Bot:
                             best_pos = pos
                             best_action = action
                         beta = min(beta, min_value)
-                        if beta <= alpha:
+                        if beta < alpha:
                             ##print('alpha cutoff')
                             break
-                    if beta <= alpha:
+                    if beta < alpha:
                         ##print('alpha cutoff')
                         break
+                #print(best_pos, best_action, min_value, depth, 'MIN')
+                if min_value == float("inf"):
+                    return None, None, None
                 return best_pos, best_action, min_value
         else:
             if fn == 'max':
@@ -419,14 +430,16 @@ class Bot:
                 for pos in self._generate_move(board):
                     for action in pos[2]:
                         board_clone = deepcopy(board)
-                        #print('POS', (pos[0], pos[1]), 'ACK', action)
+                        print('POS', (pos[0], pos[1]), 'ACK', action, 'MAX', depth)
                         self.color, self.adversary_color = self.adversary_color, self.color
                         self.game.turn = self.color
                         self._action_on_board(board_clone, pos, action)
                         _, _, step_value = self._alpha_beta(depth - 1, board_clone, 'min', alpha, beta)
                         self.color, self.adversary_color = self.adversary_color, self.color
                         self.game.turn = self.color
-                        #print('max->', depth, step_value, (pos[0], pos[1]), action, self.color)
+                        if(step_value is None):
+                            continue
+                        print('max->', depth, step_value, (pos[0], pos[1]), action, self.color)
                         if step_value > max_value:
                             max_value = step_value
                             best_pos = pos
@@ -439,9 +452,11 @@ class Bot:
                         if beta <= alpha:
                             ##print('beta cutoff')
                             break
-                    if beta <= alpha:
-                        ##print('alpha cutoff')
+                    if beta < alpha:
+                        ##print('alpha cu3toff')
                         break
+                if max_value == -float("inf"):
+                    return None, None, None
                 return best_pos, best_action, max_value
             else:
                 min_value = float("inf")
@@ -450,13 +465,15 @@ class Bot:
                 for pos in self._generate_move(board):
                     for action in pos[2]:
                         board_clone = deepcopy(board)
+                        print('POS', (pos[0], pos[1]), 'ACK', action, 'MIN', depth)
                         self.color, self.adversary_color = self.adversary_color, self.color
                         self.game.turn = self.color
                         self._action_on_board(board_clone, pos, action)
                         _, _, step_value = self._alpha_beta( depth - 1, board_clone, 'max', alpha, beta)
                         self.color, self.adversary_color = self.adversary_color, self.color
                         self.game.turn = self.color
-                        #print('min->', depth, step_value, (pos[0], pos[1]), action, self.color)
+                        if(step_value is None):
+                            continue
                         if step_value < min_value:
                             min_value = step_value
                             best_pos = (pos[0], pos[1])
@@ -465,13 +482,16 @@ class Bot:
                             min_value = step_value
                             best_pos = pos
                             best_action = action
+                        print('min->', depth, step_value, (pos[0], pos[1]), action, self.color)
                         beta = min(beta, min_value)
-                        if beta <= alpha:
+                        if beta < alpha:
                             ##print('alpha cutoff')
                             break
-                    if beta <= alpha:
+                    if beta < alpha:
                         ##print('alpha cutoff')
                         break
+                if min_value == float("inf"):
+                    return None, None, None
                 return best_pos, best_action, min_value
 
     def _action_on_board(self, board, selected_piece, mouse_pos, hop=False):
@@ -488,7 +508,25 @@ class Bot:
                     ##print("REMOVE", selected_piece, mouse_pos)
                     board.remove_piece(selected_piece[0] + (mouse_pos[0] - selected_piece[0]) //
                                        2, selected_piece[1] + (mouse_pos[1] - selected_piece[1]) // 2)
-            return
+                    hop = True
+                    selected_piece = mouse_pos
+                    mouse_pos = board.legal_moves(selected_piece[0], selected_piece[1], True)
+                    if mouse_pos != []:
+                        #print("HOP in Action", selected_piece, mouse_pos)
+                        self._action_on_board(board, selected_piece, mouse_pos[0],hop=True)
+        else:
+            if selected_piece != None and mouse_pos in board.legal_moves(selected_piece[0], selected_piece[1], hop):
+                board.move_piece(selected_piece[0], selected_piece[1], mouse_pos[0], mouse_pos[1])
+                board.remove_piece(selected_piece[0] + (mouse_pos[0] - selected_piece[0]) // 2, selected_piece[1] + (mouse_pos[1] - selected_piece[1]) // 2)
+
+            if board.legal_moves(mouse_pos[0], mouse_pos[1], self.game.hop) == []:
+                return
+            else:
+                selected_piece = mouse_pos
+                mouse_pos = board.legal_moves(selected_piece[0], selected_piece[1], True)
+                if mouse_pos != []:
+                    #print("HOP in Action", selected_piece, mouse_pos)
+                    self._action_on_board(board, selected_piece, mouse_pos[0],hop=True)
 
     def _all_kings(self, board):
         for i in range(8):
@@ -508,7 +546,7 @@ class Bot:
             for j in range(8):
                 occupant = board.location(i, j).occupant
                 if(occupant is not None):
-                    if(occupant.color == self.color):
+                    if(occupant.color == self.eval_color):
                         player_pieces.append((i, j))
                     else:
                         adversary_pieces.append((i, j))

@@ -22,17 +22,19 @@ def main():
         game = checkers.Game(loop_mode=True)
         game.setup()
         bot = gamebot.Bot(game, RED, mid_eval='piece2val',
-                          end_eval='sum_of_dist', method='minmax', depth=3)
-        random_bot_blue = gamebot.Bot(
-            game, BLUE, mid_eval='piece_and_board_pov', method='minmax', depth=3, end_eval='sum_of_dist')
+                          end_eval='sum_of_dist', method='alpha_beta', depth=3)
+        #random_bot_blue = gamebot.Bot(game, BLUE, mid_eval='piece_and_board_pov', method='alpha_beta', depth=3, end_eval='sum_of_dist')
         while True:  # main game loop
             if game.turn == BLUE:
-                # game.player_turn()
-                random_bot_blue.step(game.board)
+                # print('BLUE')
+                game.player_turn()
+                # random_bot_blue.step(game.board)
                 game.update()
             else:
+                # print('RED')
                 bot.step(game.board)
                 game.update()
+                print('####################')
             if game.endit:
                 break
         print('****************')
