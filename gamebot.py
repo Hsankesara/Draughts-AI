@@ -68,8 +68,9 @@ class Bot:
     def _action(self, selected_piece, mouse_pos, board):
         #print('xxxxxxxxxxx')
         if selected_piece is None:
-            board.repr_matrix()
-            print(self._generate_all_possible_moves(board))
+            self.game.end_turn()
+            #board.repr_matrix()
+            #print(self._generate_all_possible_moves(board))
         #print(selected_piece, mouse_pos, board.location(selected_piece[0], selected_piece[1]).occupant)
         if self.game.hop == False:
             if board.location(mouse_pos[0], mouse_pos[1]).occupant != None and board.location(mouse_pos[0], mouse_pos[1]).occupant.color == self.game.turn:
