@@ -28,8 +28,8 @@ def main():
         while True:  # main game loop
             if game.turn == BLUE:
                 # print('BLUE')
-                # game.player_turn()
-                random_bot_blue.step(game.board)
+                game.player_turn()
+                # random_bot_blue.step(game.board)
                 game.update()
             else:
                 # print('RED')

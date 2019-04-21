@@ -188,9 +188,9 @@ class Bot:
                             score += 5
                         elif occupant.color != self.eval_color and j < 4:
                             score -= 7
-                        elif occupant.color == self.eval_color and j > 4:
+                        elif occupant.color == self.eval_color and j >= 4:
                             score += 7
-                        elif occupant.color != self.eval_color and j > 4:
+                        elif occupant.color != self.eval_color and j >= 4:
                             score -= 5
         else:
             for i in range(8):
@@ -205,9 +205,9 @@ class Bot:
                             score += 7
                         elif occupant.color != self.eval_color and j < 4:
                             score -= 5
-                        elif occupant.color == self.eval_color and j > 4:
+                        elif occupant.color == self.eval_color and j >= 4:
                             score += 7
-                        elif occupant.color != self.eval_color and j > 4:
+                        elif occupant.color != self.eval_color and j >= 4:
                             score -= 5
         return score
 
@@ -228,9 +228,9 @@ class Bot:
                             score += 5
                         elif occupant.color != self.eval_color and j < 4:
                             score -= 7
-                        elif occupant.color == self.eval_color and j > 4:
+                        elif occupant.color == self.eval_color and j >= 4:
                             score += 7
-                        elif occupant.color != self.eval_color and j > 4:
+                        elif occupant.color != self.eval_color and j >= 4:
                             score -= 5
         else:
             for i in range(8):
@@ -246,9 +246,9 @@ class Bot:
                             score += 7
                         elif occupant.color != self.eval_color and j < 4:
                             score -= 5
-                        elif occupant.color == self.eval_color and j > 4:
+                        elif occupant.color == self.eval_color and j >= 4:
                             score += 7
-                        elif occupant.color != self.eval_color and j > 4:
+                        elif occupant.color != self.eval_color and j >= 4:
                             score -= 5
         return score / num_pieces
 
