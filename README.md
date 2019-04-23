@@ -88,7 +88,7 @@ pip3 install -r requirements.txt
 python3 main.py
 ```
 
-**You can tweak parameters of the game bot from [main](main.py) file**
+**You can tweak the parameters of the game bot from [main](main.py) file**
 
 ## Conclusion
 
