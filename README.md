@@ -106,7 +106,3 @@ python3 main.py
 ## Contributing
 
 Found a bug? Create an **[issue](https://github.com/Hsankesara/Draughts-AI/issues/new)**.
-
-```
-
-```
