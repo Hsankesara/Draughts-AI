@@ -2,7 +2,7 @@
 
 ## Introduction
 
-The game of checkers is considered a complicated game with $10^{20}$ possible legal positions in the English draughts version (8\*8 board) alone (much more on higher dimensions). In this attempt to create a game agent, a tree traversal approach has been used. This approach is not only fast but also efficient given that good heuristics are used. The agent has been created which is capable of playing the game of draughts or checkers with a remarkable win rate against average players. Draughts is a 1vs1 zero-sum game. Minimax or Minimax algorithm is best suited for such types of games. Following is the development procedure practised during the development of the project.
+The game of checkers is considered a complicated game with 10^20 possible legal positions in the English draughts version (8\*8 board) alone (much more on higher dimensions). In this attempt to create a game agent, a tree traversal approach has been used. This approach is not only fast but also efficient given that good heuristics are used. The agent has been created which is capable of playing the game of draughts or checkers with a remarkable win rate against average players. Draughts is a 1vs1 zero-sum game. Minimax or Minimax algorithm is best suited for such types of games. Following is the development procedure practised during the development of the project.
 
 1. Implemented a basic Minimax Agent with limited depth.
 2. Applied ⍺-β pruning.
@@ -28,46 +28,67 @@ List all the evaluation functions:
 
 #### Piece to Value
 
-$∑(Pi) + 2×∑(Ki) - ∑(OPi) - 2×∑(OKi)$
+> score = ∑Pi + 2 × ∑Ki - ∑OPi - 2 × ∑OKi
 
-Where $P_i$ and $OPi$ are the player’s and Opponent’s Pawns and $Ki$ and $OKi$ are the player’s and Opponent’s Kings respectively.
+Where Pi and OPi are the player’s and Opponent’s Pawns and Ki and OKi are the player’s and Opponent’s Kings respectively.
 
 #### Piece and Board part to value
 
-${5∑(PHPi) + 7∑(EHPi) + 10×∑(Ki)} - {5∑(PHOPi) + 7∑(EHOPi) + 10×∑(OKi)}$
+> score = (5 × ∑PHPi + 7 × ∑EHPi + 10 × ∑Ki) - (5 × ∑PHOPi + 7 × ∑EHOPi + 10 × ∑OKi)
 
-Where $PHPi$ and $PHOPi$ are the player’s and Opponent’s Pawns in their own respective halves and $EHPi$ and $EHOPi$ are their Pawns in their respective enemies’ halves.
-$Ki$ and $OKi$ are the player’s and Opponent’s Kings respectively.
+Where PHPi and PHOPi are the player’s and Opponent’s Pawns in their own respective halves and EHPi and EHOPi are their Pawns in their respective enemies’ halves.
+Ki and OKi are the player’s and Opponent’s Kings respectively.
 
 #### Piece and Row to value
 
-${ ∑[5(Pi) +ri ]+ ∑[ 7(Ki) + ri ] } - { (∑[5(OPi) + rj] + ∑[7(OKi) + rj]}$
+> score = (∑[5 × (Pi) +ri ] + ∑[7 × (Ki) + ri ]) - ((∑[5(OPi) + rj] + ∑[7(OKi) + rj]))
 
-Where $Pi$ and $OPi$ is the player’s and Opponent’s Pawns and $Ki$ and $OKi$ are the player’s and Opponent’s Kings respectively. $rj$, $ri$ are the row number of the respective piece.
+Where Pi and OPi is the player’s and Opponent’s Pawns and Ki and OKi are the player’s and Opponent’s Kings respectively. rj, ri are the row number of the respective piece.
 
 #### Piece and Board part to value (modified)
 
-${5∑(PHPi) + 7∑(EHPi) + 10×∑(Ki)} - {5∑(PHOPi) + 7∑(EHOPi) + 10×∑(OKi)}/n$
+> score = (5 × ∑PHPi + 7 × ∑EHPi + 10 × ∑Ki) - (5 × ∑PHOPi + 7 × ∑EHOPi + 10 × ∑OKi) / n
 
-Where $PHPi$ and $PHOPi$ is the player’s and Opponent’s Pawns in their own respective halves and $EHPi$ and $EHOPi$ are their Pawns in their respective enemies’ halves. $Ki$ and $OKi$ are the player’s and Opponent’s Kings respectively.
-$n$ is the number of pieces on the board.
+Where PHPi and PHOPi is the player’s and Opponent’s Pawns in their own respective halves and EHPi and EHOPi are their Pawns in their respective enemies’ halves. Ki and OKi are the player’s and Opponent’s Kings respectively.
+n is the number of pieces on the board.
 
 ### End Evaluation
 
 #### Sum of Distances
 
-$Dij$ = Distance of ith King of player from jth King of the enemy.
-$S = ∑ni = 1 ∑nj = 1 Dij$
+Dij = Distance of ith King of player from jth King of the enemy.
+
+> score = ∑∑Dij
+
+where i belongs to all the player's pieces and j belongs to all the opponent's pieces
 
 Minimise S if more number of pieces than opponent else maximise .
 
 #### Farthest Piece
 
-$Dij$ = Distance of ith King of player from jth King of the enemy.
+Dij = Distance of ith King of player from jth King of the enemy.
 
-$Dmax = max(∑nj = 1 Dij)$
+> score = max(∑Dij)
+
+where i belongs to all the player's pieces and j belongs to all the opponent's pieces
 
 Minimise Dmax if more number of pieces than opponent else maximise.
+
+## How to run the code
+
+First install Requirements
+
+```
+pip3 install -r requirements.txt
+```
+
+**You can tweak parameters of the gamebot from main function**
+
+### Run the Game
+
+```bash
+python3 main.py
+```
 
 ## Conclusion
 
@@ -85,3 +106,7 @@ Minimise Dmax if more number of pieces than opponent else maximise.
 ## Contributing
 
 Found a bug? Create an **[issue](https://github.com/Hsankesara/Draughts-AI/issues/new)**.
+
+```
+
+```
