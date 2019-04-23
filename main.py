@@ -30,12 +30,13 @@ def main():
                 # print('BLUE')
                 # game.player_turn()
                 count_nodes = random_bot_blue.step(game.board, True)
-                print('Total node explored in this step are', count_nodes)
+                print('Total nodes explored in this step are', count_nodes)
                 game.update()
             else:
                 # print('RED')
+                # game.player_turn()
                 count_nodes = bot.step(game.board, True)
-                print('Total node explored in this step are', count_nodes)
+                print('Total nodes explored in this step are', count_nodes)
                 game.update()
                 # print('####################')
             if game.endit:
