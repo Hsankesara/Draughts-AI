@@ -2,15 +2,11 @@
 
 ## Introduction
 
-The game of checkers is considered a complicated game with $10^{20}$ possible legal positions in the English draughts version (8\*8 board) alone (much more on higher dimensions). In this attempt to create a game agent, a tree traversal approach has been used. This approach is not only fast but also efficient given that better heuristics are used. We have created an agent which is capable of playing the game of draughts or checkers with a remarkable win rate against average players. Draughts is a 1vs1 zero-sum game. Minimax or Minimax algorithm is best suited for such types of games. Following is the development procedure we practised during the development of the project.
+The game of checkers is considered a complicated game with $10^{20}$ possible legal positions in the English draughts version (8\*8 board) alone (much more on higher dimensions). In this attempt to create a game agent, a tree traversal approach has been used. This approach is not only fast but also efficient given that good heuristics are used. The agent has been created which is capable of playing the game of draughts or checkers with a remarkable win rate against average players. Draughts is a 1vs1 zero-sum game. Minimax or Minimax algorithm is best suited for such types of games. Following is the development procedure practised during the development of the project.
 
 1. Implemented a basic Minimax Agent with limited depth.
 2. Applied ⍺-β pruning.
 3. Improved the evaluation functions.
-
-Initially, we considered many approaches to the implementation of this agent. Here is a report of them:
-Reinforcement Learning agent. This would have been impractical and very complex to construct as there are $10^{20}$ different states possible of the 8×8 board.
-Since this is a zero-sum game with 2 players playing 1 on 1, the minimax algorithm was the best suited for this purpose. We then designed the evaluation function.
 
 <table>
     <tr>
@@ -25,8 +21,8 @@ Since this is a zero-sum game with 2 players playing 1 on 1, the minimax algorit
 
 ## Evaluation Functions
 
-We have used 2 types of evaluation functions depending upon the state of the game. These are mid evaluation and end game evaluation function. Following is the report for the same.
-Here we list all the evaluation functions:
+Two types of evaluation functions have been used depending upon the state of the game. These are mid evaluation and end game evaluation function. Following is the report for the same.
+List all the evaluation functions:
 
 ### Mid Evaluation
 
@@ -56,7 +52,7 @@ ${5∑(PHPi) + 7∑(EHPi) + 10×∑(Ki)} - {5∑(PHOPi) + 7∑(EHOPi) + 10×∑(
 Where $PHPi$ and $PHOPi$ is the player’s and Opponent’s Pawns in their own respective halves and $EHPi$ and $EHOPi$ are their Pawns in their respective enemies’ halves. $Ki$ and $OKi$ are the player’s and Opponent’s Kings respectively.
 $n$ is the number of pieces on the board.
 
-### End Evaluation:
+### End Evaluation
 
 #### Sum of Distances
 
@@ -65,7 +61,7 @@ $S = ∑ni = 1 ∑nj = 1 Dij$
 
 Minimise S if more number of pieces than opponent else maximise .
 
-### Farthest Piece
+#### Farthest Piece
 
 $Dij$ = Distance of ith King of player from jth King of the enemy.
 
@@ -81,6 +77,10 @@ Minimise Dmax if more number of pieces than opponent else maximise.
 4. It is not efficient to use Minimax without optimizations while with them it can be a good solution.
 5. Alpha-Beta pruning is exponentially improving in comparison to Minimax as the depth grows.
 6. Certain heuristics are clearly better than others but some of the “bad” ones still work well in some cases.
+
+## References
+
+1. Two player draughts game template has been taken from [Pygame-Checkers](https://github.com/everestwitman/Pygame-Checkers/)
 
 ## Contributing
 
