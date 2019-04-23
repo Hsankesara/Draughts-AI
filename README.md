@@ -82,13 +82,13 @@ First install Requirements
 pip3 install -r requirements.txt
 ```
 
-**You can tweak parameters of the gamebot from main function**
-
 ### Run the Game
 
 ```bash
 python3 main.py
 ```
+
+**You can tweak parameters of the game bot from [main](main.py) file**
 
 ## Conclusion
 
