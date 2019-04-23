@@ -51,8 +51,10 @@ class Bot:
             self.adversary_color = BLUE
         self._current_eval = self._mid_eval
         self._end_eval_time = False
+        self._count_nodes = 0
 
-    def step(self, board):
+    def step(self, board, return_count_nodes=False):
+        self._count_nodes = 0
         if(self._end_eval is not None and self._end_eval_time == False):
             if self._all_kings(board):
                 print('END EVAL is on')
@@ -64,6 +66,8 @@ class Bot:
             self._minmax_step(board)
         elif self.method == 'alpha_beta':
             self._alpha_beta_step(board)
+        if return_count_nodes:
+            return self._count_nodes
 
     def _action(self, selected_piece, mouse_pos, board):
         #print('xxxxxxxxxxx')
@@ -116,7 +120,6 @@ class Bot:
         possible_moves = self._generate_all_possible_moves(board)
         if possible_moves == []:
             self.game.end_turn()
-            self.game.turn = BLUE
             return
         random_move = random.choice(possible_moves)
         rand_choice = random.choice(random_move[2])
@@ -258,8 +261,7 @@ class Bot:
         return
 
     def _alpha_beta_step(self, board):
-        random_move, random_choice, _ = self._alpha_beta(
-            self.depth - 1, board, 'max', alpha=-float('inf'), beta=float('inf'))
+        random_move, random_choice, _ = self._alpha_beta(self.depth - 1, board, 'max', alpha=-float('inf'), beta=float('inf'))
         #print(self.eval_color, self.game.turn, self.game.hop)
         self._action(random_move, random_choice, board)
         #print(self.eval_color, self.game.turn, self.game.hop)
@@ -277,6 +279,7 @@ class Bot:
                         self.color, self.adversary_color = self.adversary_color, self.color
                         self.game.turn = self.color
                         self._action_on_board(board_clone, pos, action)
+                        self._count_nodes += 1
                         step_value = self._current_eval(board_clone)
                         self.color, self.adversary_color = self.adversary_color, self.color
                         self.game.turn = self.color
@@ -302,6 +305,7 @@ class Bot:
                         board_clone = deepcopy(board)
                         self.color, self.adversary_color = self.adversary_color, self.color
                         self.game.turn = self.color
+                        self._count_nodes += 1
                         self._action_on_board(board_clone, pos, action)
                         step_value = self._current_eval(board_clone)
                         self.color, self.adversary_color = self.adversary_color, self.color
@@ -329,6 +333,7 @@ class Bot:
                         self.color, self.adversary_color = self.adversary_color, self.color
                         self.game.turn = self.color
                         self._action_on_board(board_clone, pos, action)
+                        self._count_nodes += 1
                         if self._check_for_endgame(board_clone):
                             step_value = float("inf")
                         else:
@@ -361,6 +366,7 @@ class Bot:
                         #print('POS', (pos[0], pos[1]), 'ACK', action, 'MIN', depth)
                         self.color, self.adversary_color = self.adversary_color, self.color
                         self.game.turn = self.color
+                        self._count_nodes += 1
                         self._action_on_board(board_clone, pos, action)
                         if self._check_for_endgame(board_clone):
                             step_value = -float("inf")
@@ -394,6 +400,7 @@ class Bot:
                         board_clone = deepcopy(board)
                         self.color, self.adversary_color = self.adversary_color, self.color
                         self.game.turn = self.color
+                        self._count_nodes += 1
                         self._action_on_board(board_clone, pos, action)
                         step_value = self._current_eval(board_clone)
                         self.color, self.adversary_color = self.adversary_color, self.color
@@ -428,6 +435,7 @@ class Bot:
                         self.color, self.adversary_color = self.adversary_color, self.color
                         self.game.turn = self.color
                         self._action_on_board(board_clone, pos, action)
+                        self._count_nodes += 1
                         step_value = self._current_eval(board_clone)
                         self.color, self.adversary_color = self.adversary_color, self.color
                         self.game.turn = self.color
@@ -462,6 +470,7 @@ class Bot:
                         self.color, self.adversary_color = self.adversary_color, self.color
                         self.game.turn = self.color
                         self._action_on_board(board_clone, pos, action)
+                        self._count_nodes += 1
                         if self._check_for_endgame(board_clone):
                             step_value = float("inf")
                         else:
@@ -501,6 +510,7 @@ class Bot:
                         #print('POS', (pos[0], pos[1]), 'ACK', action, 'MIN', depth)
                         self.color, self.adversary_color = self.adversary_color, self.color
                         self.game.turn = self.color
+                        self._count_nodes += 1
                         self._action_on_board(board_clone, pos, action)
                         if self._check_for_endgame(board_clone):
                             step_value = -float("inf")
